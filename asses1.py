@@ -20,19 +20,21 @@ def cost(ind):
     criteria = ind[(i * squareSize) : (i*squareSize) + squareSize]
     rowSum = np.sum(criteria)
     result += (expectedValue - rowSum)**2
-#    print ("\nRow. " , criteria , ", the sum is " , rowSum , ", The result is " ,result)
+    print ("\nRow. " , criteria , ", the sum is " , rowSum , ", The result is " ,result)
+  print("\nresult  " , result)
 
  
  # process the columns  
   for col in range(squareSize):
     colSum = 0
-#    print("Col")
+    print("Col")
     for row in range(col, len(ind), squareSize):
       colSum += ind[row]
 #      print(ind.chromosome[row], end=' ')
 
     result += (expectedValue - colSum)**2
-#    print("the sum is " , colSum , ", the result is " ,  result)
+    print("the sum is " , colSum , ", the result is " ,  result)
+  print("\nresult  " , result)
 
 # process the left right top diagonal 
   index = 0
@@ -67,7 +69,7 @@ def cost(ind):
 	
 class problem:
   def __init__(self):
-    self.squareSize = 3
+    self.squareSize = 4
     self.number_of_genes = self.squareSize**2
     self.cost_function = cost
 
@@ -86,11 +88,12 @@ class parameters:
 class individual:
   def __init__(self, prob ):
     self.chromosome = list(range(1,(prob.number_of_genes+1)))
+    random.shuffle(self.chromosome)
+
     self.squareSize = prob.squareSize
     self.cost = prob.cost_function(self.chromosome )
  
 
-    random.shuffle(self.chromosome)
 
 
   def mutate(self, mutateRate, mutateRange):
@@ -224,4 +227,8 @@ def run_genetic(prob, params):
   return best_solution
 
 bs = run_genetic(p1,par1)
-
+print("\nCost  ", bs.cost)
+#p = problem()
+#ind = individual(p)
+#c = ind.cost
+#print("chromosome  ", ind.chromosome ,"\ncost  ", c)
