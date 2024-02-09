@@ -20,21 +20,21 @@ def cost(ind):
     criteria = ind[(i * squareSize) : (i*squareSize) + squareSize]
     rowSum = np.sum(criteria)
     result += (expectedValue - rowSum)**2
-    print ("\nRow. " , criteria , ", the sum is " , rowSum , ", The result is " ,result)
-  print("\nresult  " , result)
+#    print ("\nRow. " , criteria , ", the sum is " , rowSum , ", The result is " ,result)
+#  print("\nresult  " , result)
 
  
  # process the columns  
   for col in range(squareSize):
     colSum = 0
-    print("Col")
+#    print("Col")
     for row in range(col, len(ind), squareSize):
       colSum += ind[row]
 #      print(ind.chromosome[row], end=' ')
 
     result += (expectedValue - colSum)**2
-    print("the sum is " , colSum , ", the result is " ,  result)
-  print("\nresult  " , result)
+#    print("the sum is " , colSum , ", the result is " ,  result)
+#  print("\nresult  " , result)
 
 # process the left right top diagonal 
   index = 0
@@ -69,7 +69,7 @@ def cost(ind):
 	
 class problem:
   def __init__(self):
-    self.squareSize = 4
+    self.squareSize = 3
     self.number_of_genes = self.squareSize**2
     self.cost_function = cost
 
@@ -77,9 +77,9 @@ class problem:
 class parameters:
   def __init__(self):
     self.population  = 1000
-    self.number_of_generations = 100
+    self.number_of_generations = 500
     self.gene_mutate_rate = 0.2
-    self.crossover_explore_rate = 0.2
+    self.crossover_explore_rate = 4
     self.child_rate_per_generation = 1
     self.gene_mutate_range = 0.5
 
@@ -109,9 +109,10 @@ class individual:
         self.chromosome[swap] = aux
 
 
-  def crossover(self, parent1, explore):
-    number_of_genes = len(self.chromosome)
-    split = np.random.randint(1, number_of_genes)
+  def crossover(self, parent1, explore_rate):
+    number_of_genes = len(self.chromosome) - explore_rate
+    split = np.random.randint(1, number_of_genes)  
+#    print("split value " , split)
     child1 = deepcopy(self)
     child1.chromosome = self.chromosome[:split]
     aux = self.chromosome[split:]
@@ -227,7 +228,11 @@ def run_genetic(prob, params):
   return best_solution
 
 bs = run_genetic(p1,par1)
-print("\nCost  ", bs.cost)
+print("\nThe length of the chromosome is " , len(bs.chromosome), 
+"\nThe square size is " , round(len(bs.chromosome)**0.5) ,
+"\nThe best solution " ,
+"\nThe chromosome is " , bs.chromosome ,
+ "\nThe cost is ", bs.cost)
 #p = problem()
 #ind = individual(p)
 #c = ind.cost
