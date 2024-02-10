@@ -76,12 +76,12 @@ class problem:
 
 class parameters:
   def __init__(self):
-    self.population  = 1000
-    self.number_of_generations = 500
+    self.population  = 10
+    self.number_of_generations = 5 
     self.gene_mutate_rate = 0.2
     self.crossover_explore_rate = 4
     self.child_rate_per_generation = 1
-    self.gene_mutate_range = 0.5
+    self.gene_mutate_range = 4
 
 
 	
@@ -98,20 +98,28 @@ class individual:
 
   def mutate(self, mutateRate, mutateRange):
     for index in range(len(self.chromosome)):
+
       if (np.random.uniform() < mutateRate):
-        swap = index + 1
-        aux =self.chromosome[index] 
+        index2 = index 
+ 
+        for x in range(mutateRange ):
+          index2 = index2 + x
 
-        if ((index+1) == len(self.chromosome)):
-          swap = 0    
+          if (index2  >= len(self.chromosome)):  index2 = 0
 
-        self.chromosome[index] = self.chromosome[swap]
-        self.chromosome[swap] = aux
+          swap = index2 + 1
+          aux =self.chromosome[index2] 
 
+          if ((index2 + 1) == len(self.chromosome)):  swap = 0
+            
+          self.chromosome[index2] = self.chromosome[swap]
+          self.chromosome[swap] = aux
+#          print("\n    ", self.chromosome[index2] , "  ", self.chromosome[swap] )
+ 
 
   def crossover(self, parent1, explore_rate):
-    number_of_genes = len(self.chromosome) - explore_rate
-    split = np.random.randint(1, number_of_genes)  
+ 
+    split = np.random.randint(1 , len(self.chromosome) - explore_rate)  
 #    print("split value " , split)
     child1 = deepcopy(self)
     child1.chromosome = self.chromosome[:split]
@@ -144,15 +152,7 @@ class individual:
     return child1, child2 
 
 
-print("hello")
-p1 = problem()
-par1 = parameters()
-#ind1 = individual(prob)
-#ind2 = individual(prob)
-#child, child2 = ind1.crossover(ind2, prob.number_of_genes)
-
-#print("\nparent1 \n" , ind1.chromosome , "\nparent2 \n" , ind2.chromosome , "\nchild1 \n" , child.chromosome) 
-
+ 
 ###############################
 
 def choose_indices_from(number_in_list):
@@ -226,14 +226,24 @@ def run_genetic(prob, params):
 
 
   return best_solution
+##### execution
+print("hello")
 
-bs = run_genetic(p1,par1)
+
+prob = problem()
+par = parameters()
+bs = run_genetic(prob,par)
 print("\nThe length of the chromosome is " , len(bs.chromosome), 
 "\nThe square size is " , round(len(bs.chromosome)**0.5) ,
 "\nThe best solution " ,
 "\nThe chromosome is " , bs.chromosome ,
  "\nThe cost is ", bs.cost)
+
 #p = problem()
 #ind = individual(p)
+#pa = parameters()
+#print("\noriginal\n", ind.chromosome)
+#ind.mutate(pa.gene_mutate_rate, pa.gene_mutate_range)
+#print("\nmutate\n", ind.chromosome)
 #c = ind.cost
 #print("chromosome  ", ind.chromosome ,"\ncost  ", c)
