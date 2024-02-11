@@ -69,19 +69,19 @@ def cost(ind):
 	
 class problem:
   def __init__(self):
-    self.squareSize = 3
+    self.squareSize = 5
     self.number_of_genes = self.squareSize**2
     self.cost_function = cost
 
 
 class parameters:
   def __init__(self):
-    self.population  = 10
-    self.number_of_generations = 5 
+    self.population  = 1000
+    self.number_of_generations = 300 
     self.gene_mutate_rate = 0.2
     self.crossover_explore_rate = 4
     self.child_rate_per_generation = 1
-    self.gene_mutate_range = 4
+    self.gene_mutate_range = 8
 
 
 	
@@ -234,7 +234,10 @@ prob = problem()
 par = parameters()
 bs = run_genetic(prob,par)
 print("\nThe length of the chromosome is " , len(bs.chromosome), 
-"\nThe square size is " , round(len(bs.chromosome)**0.5) ,
+". The square size is " , round(len(bs.chromosome)**0.5) ,
+"\nThe population is ", par.population , ". The number of generations is ", par.number_of_generations ,
+". The mutate rate is " , par.gene_mutate_rate , ". The mutate range is " , par.gene_mutate_range ,
+". The explore rate is " , par.crossover_explore_rate ,
 "\nThe best solution " ,
 "\nThe chromosome is " , bs.chromosome ,
  "\nThe cost is ", bs.cost)
