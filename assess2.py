@@ -38,6 +38,7 @@ class CurrentBoard:
 		for row in matrix:
 			print(" ".join(row))
 
+
 	def state_of_board(self):
 		if " " in self.board:
 			return "U"
@@ -48,6 +49,7 @@ class CurrentBoard:
 			return"2"
 
 		return "D"
+
  
 	def other(self, piece):
 		if piece == "1":
@@ -55,54 +57,9 @@ class CurrentBoard:
 		return "1"
 
 
-	def eq3(self):
-		return 1
+ 
 
 ########### 
-
-def get_blank_positions(board, position):
-    matrix = [list(board[i:i+4]) for i in range(0, 16, 4)]
-
-    row, col = position // 4, position % 4
-
-    # Right cell position
-    right_position = (row, col + 1) if col + 1 < 4 and matrix[row][col + 1] == ' ' else None
-
-    # Left cell position
-    left_position = (row, col - 1) if col - 1 >= 0 and matrix[row][col - 1] == ' ' else None
-
-    # Top cell position
-    top_position = (row - 1, col) if row - 1 >= 0 and matrix[row - 1][col] == ' ' else None
-
-    # Bottom cell position
-    bottom_position = (row + 1, col) if row + 1 < 4 and matrix[row + 1][col] == ' ' else None
-
-    return right_position, left_position, top_position, bottom_position
-
-def display_matrix_with_blank_positions(board, position):
-    matrix = [list(board[i:i+4]) for i in range(0, 16, 4)]
-
-    row, col = position // 4, position % 4
-
-    # Display the matrix
-    print("Matrix:")
-    for i in range(4):
-        for j in range(4):
-            cell_value = matrix[i][j]
-            if i == row and j == col:
-                cell_value = f"[{cell_value}]"
-            print(cell_value, end=' ')
-        print()
-
-    right_position, left_position, top_position, bottom_position = get_blank_positions(board, position)
-
-    # Display blank cell positions in the original string
-    print("\nBlank Cell Positions:")
-    print(f"Right Cell Position: {right_position[0] * 4 + right_position[1]}" if right_position is not None else "Right Cell is not blank")
-    print(f"Left Cell Position: {left_position[0] * 4 + left_position[1]}" if left_position is not None else "Left Cell is not blank")
-    print(f"Top Cell Position: {top_position[0] * 4 + top_position[1]}" if top_position is not None else "Top Cell is not blank")
-    print(f"Bottom Cell Position: {bottom_position[0] * 4 + bottom_position[1]}" if bottom_position is not None else "Bottom Cell is not blank")
-
 
 def replace_oso(board, position):
     # Convert the string to a 4X4 
@@ -129,7 +86,51 @@ def replace_oso(board, position):
     return updated_matrix_str
 
 
+  
+def check_moves(board):
+	index = 0
+	result = []
+	for c in board :
  
+		if c == " ":
+			result += check_piece(board, index) 
+		index += 1
+
+	return list(set(result))
+#	print(moves , "available") 
+
+
+
+
+def check_piece(board, index):
+	left = index - 1
+	right = index + 1
+	down = index - 4
+	top = index + 4
+	list = []
+
+	if (not (left < 0 or left == 3 or left == 7 or left == 11)):
+		if  is_player1(board[left]):
+			list.append(index)
+
+	if (not (right > 15 or right == 4 or right == 8 or left == 12)):
+		if  is_player1(board[right]):
+			list.append(index)
+
+
+	if  not (top > 15 ):
+		if  is_player1(board[top]):
+			list.append(index)
+	
+	if  not (down < 0):
+		if  is_player1(board[down]):
+			list.append(index)
+
+	return list
+ 
+def is_player1(char):
+	return char == 'S' or char == 'O'
+
 
 ######
 def main():
@@ -149,16 +150,17 @@ def main():
 	for x in range(16):
 		print("result " , cb.player1Points , " " , cb.player2Points)
 
+# Player1's turn 
 		if players_turn == "1":
 			print("Player 1")
 
 			if player1Start == True:
+# first player's turn
 				print("First move. ")
  
 				player1Start = False
 			else:
-				display_matrix_with_blank_positions(cb.board, player1Position)
-
+ 
 				player1Position = int(input("Choose the position "))
 
 			letter = input ("Choose between 'O' or 'S'")
@@ -171,14 +173,16 @@ def main():
 
  
 		else:
+# players2's turn
+			print ("possible moves \n" ,check_moves(cb.board))
 			print("Player 2")
 			if  player2Start == True:
+# first player's turn
 				print("First move. ")
  
 				player2Start = False
 			else:
-				display_matrix_with_blank_positions(cb.board, player2Position )
-
+ 
 				player2Position = int(input("Choose the position "))
 
 			letter = input ("Choose between 'O' or 'S'")
