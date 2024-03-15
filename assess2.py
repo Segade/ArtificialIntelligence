@@ -52,10 +52,24 @@ class CurrentBoard:
 
  
 	def other(self, piece):
-		if piece == "1":
-			return "2"
-		return "1"
+		if piece == "oso":
+			return "OSO"
+		return "oso"
 
+	def all_possible_moves(self, player_piece):
+		possible_moves = []
+		list = check_moves(self.board, player_piece)
+
+		for index in list :
+			if player_piece == "oso":
+ 
+					possible_moves.append( CurrentBoard(self.board[:index] + "o" + self.board[index+1:]))
+					possible_moves.append( CurrentBoard(self.board[:index] + "s" + self.board[index+1:]))
+			else:
+					possible_moves.append( CurrentBoard(self.board[:index] + "O" + self.board[index+1:]))
+					possible_moves.append( CurrentBoard(self.board[:index] + "S" + self.board[index+1:]))
+ 
+		return possible_moves
 
  
 
@@ -63,6 +77,7 @@ class CurrentBoard:
 
 def replace_oso(board, position):
     # Convert the string to a 4X4 
+ 
     matrix = [list(board[i:i+4]) for i in range(0, 16, 4)]
 
     # Extract position coordinates
@@ -71,7 +86,7 @@ def replace_oso(board, position):
     # Define function to check and replace "oso" in the specified direction
     def check_and_replace(dx, dy):
         if 0 <= row + 2*dx < 4 and 0 <= col + 2*dy < 4:
-            if matrix[row][col] == 'o' and matrix[row+dx][col+dy] == 's' and matrix[row+2*dx][col+2*dy] == 'o':
+            if matrix[row][col].lower() == 'o' and matrix[row+dx][col+dy].lower() == 's' and matrix[row+2*dx][col+2*dy].lower() == 'o':
                 matrix[row][col] = matrix[row+dx][col+dy] = matrix[row+2*dx][col+2*dy] = 'X'
 
     # Check and replace in all four directions
@@ -87,9 +102,16 @@ def replace_oso(board, position):
 
 
   
-def check_moves(board):
+def check_moves(board, player_piece):
 	index = 0
 	result = []
+
+	if player_piece == "oso" and board[0] == " ":
+		return [0]
+
+	if player_piece == "OSO" and board[15] == " ":
+		return [15]
+	print("pass")
 	for c in board :
  
 		if c == " ":
@@ -138,12 +160,11 @@ def main():
 	player2Start = True
 	player1Position = 0
 	player2Position = 15
-	player1Points = 0
-	player2Points = 0
+ 
 
 #	response = input("Do you wish to play first (y/n) ?")
 #	if (response == "y"):
-	players_turn = "1"
+	players_turn = "oso"
 	cb = CurrentBoard()
 
 
@@ -151,7 +172,7 @@ def main():
 		print("result " , cb.player1Points , " " , cb.player2Points)
 
 # Player1's turn 
-		if players_turn == "1":
+		if players_turn == "oso":
 			print("Player 1")
 
 			if player1Start == True:
@@ -174,7 +195,7 @@ def main():
  
 		else:
 # players2's turn
-			print ("possible moves \n" ,check_moves(cb.board))
+			print ("possible moves \n" ,check_moves(cb.board, players_turn))
 			print("Player 2")
 			if  player2Start == True:
 # first player's turn
