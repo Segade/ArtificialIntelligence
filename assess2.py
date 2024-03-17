@@ -27,8 +27,7 @@ class CurrentBoard:
 
 		self.display_matrix(c)
 
-	def display_matrix(self,input_string):
-
+	def display_matrix(self, input_string):
 		matrix = [[0] * 4 for _ in range(4)]
 
 		for i in range(4):
@@ -37,6 +36,10 @@ class CurrentBoard:
 
 		for row in matrix:
 			print(" ".join(row))
+
+
+
+
 
 
 	def state_of_board(self):
@@ -59,6 +62,7 @@ class CurrentBoard:
 	def all_possible_moves(self, player_piece):
 		possible_moves = []
 		list = check_moves(self.board, player_piece)
+ 
 
 		for index in list :
 			if player_piece == "oso":
@@ -111,47 +115,106 @@ def check_moves(board, player_piece):
 
 	if player_piece == "OSO" and board[15] == " ":
 		return [15]
-	print("pass")
-	for c in board :
+	else: 
+		for c in board :
  
-		if c == " ":
-			result += check_piece(board, index) 
-		index += 1
+			if c == " ":
+				result += check_piece(board, index, player_piece) 
+			index += 1
 
 	return list(set(result))
-#	print(moves , "available") 
+ 
 
 
 
 
-def check_piece(board, index):
+def check_piece(board, index, player_piece):
 	left = index - 1
 	right = index + 1
 	down = index - 4
 	top = index + 4
 	list = []
 
-	if (not (left < 0 or left == 3 or left == 7 or left == 11)):
-		if  is_player1(board[left]):
-			list.append(index)
 
-	if (not (right > 15 or right == 4 or right == 8 or left == 12)):
-		if  is_player1(board[right]):
-			list.append(index)
+	if player_piece == "OSO":
+		if (not (left < 0 or left == 3 or left == 7 or left == 11)) and is_upper_piece(board[left]):
+				list.append(index)
 
+		if (not (right > 15 or right == 4 or right == 8 or right == 12)) and is_upper_piece(board[right]):
+				list.append(index)
 
-	if  not (top > 15 ):
-		if  is_player1(board[top]):
-			list.append(index)
+		if  not (top > 15 ) and is_upper_piece(board[top]):
+				list.append(index)
 	
-	if  not (down < 0):
-		if  is_player1(board[down]):
-			list.append(index)
+		if  not (down < 0) and is_upper_piece(board[down]):
+				list.append(index)
+	else:
+		if (not (left < 0 or left == 3 or left == 7 or left == 11)) and is_lower_piece(board[left]):
+				list.append(index)
+
+		if (not (right > 15 or right == 4 or right == 8 or right == 12)) and is_lower_piece(board[right]):
+				list.append(index)
+
+		if  not (top > 15 ) and is_lower_piece(board[top]):
+				list.append(index)
+	
+		if  not (down < 0) and is_lower_piece(board[down]):
+				list.append(index)
+
 
 	return list
  
-def is_player1(char):
+def is_upper_piece(char):
 	return char == 'S' or char == 'O'
+
+def is_lower_piece(char):
+	return char == 's' or char == 'o'
+
+
+#########
+# Search Tree 
+ 
+
+class SearchTreeNode:
+
+  def __init__(self,board_instance,playing_as, ply=0):
+    self.children = []
+    self.value_is_assigned = False
+    self.ply_depth = ply
+    self.current_board = board_instance
+    self.move_for = playing_as
+    if self.current_board.state == "U":
+      self.generate_children()
+    else:   # Game over
+      if self.current_board.state == "D":
+        self.value = 0
+      else:
+        if ((self.ply_depth % 2) == 0):
+          self.value = -1
+        else:
+          self.value = 1
+      self.value_is_assigned = True
+
+  def min_max_value(self):
+    if self.value_is_assigned:
+      return self.value
+
+    self.children  = sorted(self.children, key = lambda x:x.min_max_value())
+
+    if ((self.ply_depth % 2) == 0):
+      # computers move
+      self.value = self.children[-1].value
+    else:
+      #players move
+      self.value = self.children[0].value
+    self.value_is_assigned = True
+
+    return self.value
+
+  def generate_children(self):
+    for board_for_next_move in self.current_board.all_possible_moves(self.move_for):
+      self.children.append(SearchTreeNode(board_for_next_move,self.current_board.other(self.move_for), ply = self.ply_depth +1))
+
 
 
 ######
@@ -171,12 +234,13 @@ def main():
 	for x in range(16):
 		print("result " , cb.player1Points , " " , cb.player2Points)
 
-# Player1's turn 
+# Player oso's turn 
 		if players_turn == "oso":
-			print("Player 1")
+			print("Player oso")
+			print ("possible moves \n" ,check_moves(cb.board, players_turn))
 
 			if player1Start == True:
-# first player's turn
+#  player oso's turn
 				print("First move. ")
  
 				player1Start = False
@@ -184,7 +248,7 @@ def main():
  
 				player1Position = int(input("Choose the position "))
 
-			letter = input ("Choose between 'O' or 'S'")
+			letter = input ("Choose between 'o' or 's'")
 			cb.board = cb.board[:player1Position] + letter + cb.board[player1Position+1 :] 
  
 			aBoard = replace_oso(cb.board, player1Position)
@@ -194,20 +258,14 @@ def main():
 
  
 		else:
-# players2's turn
+# player OSO's turn AI
 			print ("possible moves \n" ,check_moves(cb.board, players_turn))
-			print("Player 2")
-			if  player2Start == True:
-# first player's turn
-				print("First move. ")
- 
-				player2Start = False
-			else:
- 
-				player2Position = int(input("Choose the position "))
+			print("Player OSO AI")
 
-			letter = input ("Choose between 'O' or 'S'")
-			cb.board = cb.board[:player2Position] + letter + cb.board[player2Position+1 :]
+			search_tree = SearchTreeNode(cb, "OSO")
+			search_tree.min_max_value()
+			cb = search_tree.children[-1].current_board
+
  
 			aBoard = replace_oso(cb.board, player2Position)
 			if (cb.board != aBoard):
