@@ -46,10 +46,10 @@ class CurrentBoard:
 		if " " in self.board:
 			return "U"
     
-		if player1Points > player2Points:
-			return "1"
+		if self.player1Points > self.player2Points:
+			return "oso"
 		else:
-			return"2"
+			return"OSO"
 
 		return "D"
 
@@ -275,7 +275,7 @@ def main():
 		players_turn = cb.other(players_turn)
 		cb.display()
  
-
+	print("The winner is " , cb.state)
 
 
 main()
