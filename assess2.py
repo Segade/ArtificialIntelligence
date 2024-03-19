@@ -7,7 +7,7 @@ class CurrentBoard:
 
 	def __init__(self, string_def = " " * 16):
 		self.board = string_def 
-		self.state= ""
+		self.state= self.state_of_board()
  
 
 	def display(self, game_display = False):
@@ -48,10 +48,10 @@ class CurrentBoard:
     
 		if self.player1Points > self.player2Points:
 			return "oso"
-		else:
+		elif self.player2Points > self.player1Points:
 			return"OSO"
-
-		return "D"
+		else:
+			return "D"
 
  
 	def other(self, piece):
@@ -62,7 +62,7 @@ class CurrentBoard:
 	def all_possible_moves(self, player_piece):
 		possible_moves = []
 		list = check_moves(self.board, player_piece)
- 
+#		print("list " , list) 
 
 		for index in list :
 			if player_piece == "oso":
@@ -261,7 +261,8 @@ def main():
 # player OSO's turn AI
 			print ("possible moves \n" ,check_moves(cb.board, players_turn))
 			print("Player OSO AI")
-
+#			for x in cb.all_possible_moves("OSO"):
+#				print("all possible moves " , x.board)
 			search_tree = SearchTreeNode(cb, "OSO")
 			search_tree.min_max_value()
 			cb = search_tree.children[-1].current_board
