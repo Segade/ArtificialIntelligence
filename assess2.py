@@ -25,7 +25,8 @@ class CurrentBoard:
 		else:
 			c = self.board 
 
-		self.display_matrix(c)
+		print (c)
+#		self.display_matrix(c)
 
 	def display_matrix(self, input_string):
 		matrix = [[0] * 4 for _ in range(4)]
@@ -45,7 +46,18 @@ class CurrentBoard:
 	def state_of_board(self):
 		if " " in self.board:
 			return "U"
-    
+
+		list = check_moves(self.board, "OSO")
+ 
+		for i in list:
+			self.player2Points += count_oso(self.board, i)
+
+		list = check_moves(self.board, "oso")
+
+		for i in list:
+			self.player1Points += count_oso(self.board, i)
+
+
 		if self.player1Points > self.player2Points:
 			return "oso"
 		elif self.player2Points > self.player1Points:
@@ -78,31 +90,37 @@ class CurrentBoard:
  
 
 ########### 
-
-def replace_oso(board, position):
-    # Convert the string to a 4X4 
- 
-    matrix = [list(board[i:i+4]) for i in range(0, 16, 4)]
-
-    # Extract position coordinates
+def count_oso(board, position):
+    count = 0
+    string = board.lower()  # Convert the string to lowercase for case-insensitive comparison
     row, col = position // 4, position % 4
-
-    # Define function to check and replace "oso" in the specified direction
-    def check_and_replace(dx, dy):
-        if 0 <= row + 2*dx < 4 and 0 <= col + 2*dy < 4:
-            if matrix[row][col].lower() == 'o' and matrix[row+dx][col+dy].lower() == 's' and matrix[row+2*dx][col+2*dy].lower() == 'o':
-                matrix[row][col] = matrix[row+dx][col+dy] = matrix[row+2*dx][col+2*dy] = 'X'
-
-    # Check and replace in all four directions
-    check_and_replace(0, 1)  # Right
-    check_and_replace(0, -1)  # Left
-    check_and_replace(1, 0)  # Down
-    check_and_replace(-1, 0)  # Up
-
-    # Convert the updated matrix back to a string
-    updated_matrix_str = ''.join([''.join(row) for row in matrix])
-
-    return updated_matrix_str
+    
+    # Check right
+    if col <= 1 and string[row*4 + col: row*4 + col + 3] == 'oso':
+        count += 1
+    
+    # Check left
+    if col >= 2 and string[row*4 + col - 2: row*4 + col + 1] == 'oso':
+        count += 1
+    
+    # Check down
+    if row <= 1 and string[row*4 + col: row*4 + col + 9: 4] == 'oso':
+        count += 1
+    
+    # Check up
+    if row >= 2 and string[(row - 2)*4 + col: row*4 + col + 1: 4] == 'oso':
+        count += 1
+    
+    # Check middle (if position is the middle letter)
+    if string[position] == 's':
+        # Check right and left
+        if string[position-1] == 'o' and string[position+1] == 'o':
+            count += 1
+        # Check up and down
+        if string[position-4] == 'o' and string[position+4] == 'o':
+            count += 1
+    
+    return count
 
 
   
@@ -183,8 +201,10 @@ class SearchTreeNode:
     self.ply_depth = ply
     self.current_board = board_instance
     self.move_for = playing_as
+    self.max_ply_depth = 6
     if self.current_board.state == "U":
-      self.generate_children()
+      if self.ply_depth < self.max_ply_depth:
+        self.generate_children()
     else:   # Game over
       if self.current_board.state == "D":
         self.value = 0
@@ -232,7 +252,7 @@ def main():
 
 
 	for x in range(16):
-		print("result " , cb.player1Points , " " , cb.player2Points)
+#		print("result " , cb.player1Points , " " , cb.player2Points)
 
 # Player oso's turn 
 		if players_turn == "oso":
@@ -251,11 +271,7 @@ def main():
 			letter = input ("Choose between 'o' or 's'")
 			cb.board = cb.board[:player1Position] + letter + cb.board[player1Position+1 :] 
  
-			aBoard = replace_oso(cb.board, player1Position)
-			if (cb.board != aBoard):
-				cb.board = aBoard
-				cb.player1Points += 1
-
+ 
  
 		else:
 # player OSO's turn AI
@@ -266,14 +282,11 @@ def main():
 			search_tree = SearchTreeNode(cb, "OSO")
 			search_tree.min_max_value()
 			cb = search_tree.children[-1].current_board
-
  
-			aBoard = replace_oso(cb.board, player2Position)
-			if (cb.board != aBoard):
-				cb.board = aBoard
-				cb.player2Points += 1
+ 
 
 		players_turn = cb.other(players_turn)
+		print ("state " , cb.state)
 		cb.display()
  
 	print("The winner is " , cb.state)
