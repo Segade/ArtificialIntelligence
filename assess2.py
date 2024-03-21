@@ -286,10 +286,10 @@ def main():
  
 
 		players_turn = not players_turn
-		print (" " , cb.capital_score , " " , cb.lower_score)
+ 
 		cb.display()
  
-	print("The winner is " , cb.state)
+ 
 
 
 main()
