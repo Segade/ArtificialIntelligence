@@ -2,12 +2,13 @@
 
 class CurrentBoard:
 	board = ""
-	player1Points = 0
-	player2Points = 0
+ 
 
-	def __init__(self, string_def = " " * 16):
+	def __init__(self, string_def = " " * 16, capital_score = 0, lower_score = 0):
 		self.board = string_def 
 		self.state= self.state_of_board()
+		self.capital_score = capital_score
+		self.lower_score = lower_score
  
 
 	def display(self, game_display = False):
@@ -25,18 +26,18 @@ class CurrentBoard:
 		else:
 			c = self.board 
 
-		print (c)
-#		self.display_matrix(c)
+#		print (c)
+		self.display_matrix(c)
 
 	def display_matrix(self, input_string):
-		matrix = [[0] * 4 for _ in range(4)]
-
-		for i in range(4):
-			for j in range(4):
-				matrix[i][j] = input_string[i * 4 + j]
-
-		for row in matrix:
-			print(" ".join(row))
+		print ("  1 2 3 4 ")
+		print ("1 " , self.board[0] , "|" , self.board[1] , "|" , self.board[2] , "|" , self.board[3])
+		print ("-----------")
+		print ("2 " , self.board[4] , "|" , self.board[5] , "|" , self.board[6] , "|" , self.board[7])
+		print ("-----------")
+		print ("3 " , self.board[8] , "|" , self.board[9] , "|" , self.board[10] , "|" , self.board[11])
+		print ("-----------")
+		print ("4 " , self.board[12] , "|" , self.board[13] , "|" , self.board[14] , "|" , self.board[15])
 
 
 
@@ -46,24 +47,8 @@ class CurrentBoard:
 	def state_of_board(self):
 		if " " in self.board:
 			return "U"
-
-		list = check_moves(self.board, "OSO")
  
-		for i in list:
-			self.player2Points += count_oso(self.board, i)
-
-		list = check_moves(self.board, "oso")
-
-		for i in list:
-			self.player1Points += count_oso(self.board, i)
-
-
-		if self.player1Points > self.player2Points:
-			return "oso"
-		elif self.player2Points > self.player1Points:
-			return"OSO"
-		else:
-			return "D"
+		return "F"
 
  
 	def other(self, piece):
@@ -78,12 +63,15 @@ class CurrentBoard:
 
 		for index in list :
 			if player_piece == "oso":
- 
-					possible_moves.append( CurrentBoard(self.board[:index] + "o" + self.board[index+1:]))
-					possible_moves.append( CurrentBoard(self.board[:index] + "s" + self.board[index+1:]))
+					self.lower_score += count_oso(self.board[:index] + "o" + self.board[index+1:], index)
+					possible_moves.append( CurrentBoard(self.board[:index] + "o" + self.board[index+1:], self.capital_score, self.lower_score))
+					self.lower_score += count_oso(self.board[:index] + "s" + self.board[index+1:], index)
+					possible_moves.append( CurrentBoard(self.board[:index] + "s" + self.board[index+1:], self.capital_score, self.lower_score))
 			else:
-					possible_moves.append( CurrentBoard(self.board[:index] + "O" + self.board[index+1:]))
-					possible_moves.append( CurrentBoard(self.board[:index] + "S" + self.board[index+1:]))
+					self.capital_score += count_oso(self.board[:index] + "O" + self.board[index+1:], index)
+					possible_moves.append( CurrentBoard(self.board[:index] + "O" + self.board[index+1:], self.capital_score, self.lower_score))
+					self.capital_score += count_oso(self.board[:index] + "S" + self.board[index+1:], index)
+					possible_moves.append( CurrentBoard(self.board[:index] + "S" + self.board[index+1:], self.capital_score, self.lower_score))
  
 		return possible_moves
 
@@ -117,7 +105,8 @@ def count_oso(board, position):
         if string[position-1] == 'o' and string[position+1] == 'o':
             count += 1
         # Check up and down
-        if string[position-4] == 'o' and string[position+4] == 'o':
+        if position - 4 >= 0 and position + 4 < 16:
+          if string[position-4] == 'o' and string[position+4] == 'o':
             count += 1
     
     return count
@@ -205,15 +194,22 @@ class SearchTreeNode:
     if self.current_board.state == "U":
       if self.ply_depth < self.max_ply_depth:
         self.generate_children()
-    else:   # Game over
-      if self.current_board.state == "D":
-        self.value = 0
       else:
-        if ((self.ply_depth % 2) == 0):
-          self.value = -1
-        else:
-          self.value = 1
-      self.value_is_assigned = True
+# max ply depth here 
+        self.value = self.current_board.capital_score - self.current_board.lower_score
+        self.value_is_assigned = True
+
+
+#    else:   # Game over
+#      if self.current_board.state == "D":
+ 
+#        self.value = 0
+#      else:
+#        if ((self.ply_depth % 2) == 0):
+#          self.value = -1
+#        else:
+#          self.value = 1
+#      self.value_is_assigned = True
 
   def min_max_value(self):
     if self.value_is_assigned:
@@ -245,9 +241,12 @@ def main():
 	player2Position = 15
  
 
-#	response = input("Do you wish to play first (y/n) ?")
-#	if (response == "y"):
-	players_turn = "oso"
+	response = input("Do you wish to play first (y/n) ?")
+ 
+	players_turn = (response == "y")
+
+ 
+
 	cb = CurrentBoard()
 
 
@@ -255,12 +254,12 @@ def main():
 #		print("result " , cb.player1Points , " " , cb.player2Points)
 
 # Player oso's turn 
-		if players_turn == "oso":
-			print("Player oso")
-			print ("possible moves \n" ,check_moves(cb.board, players_turn))
+		if players_turn :
+			print("Player's turn")
+			print ("possible moves \n" ,check_moves(cb.board, "oso"))
 
 			if player1Start == True:
-#  player oso's turn
+#  player's turn
 				print("First move. ")
  
 				player1Start = False
@@ -270,23 +269,24 @@ def main():
 
 			letter = input ("Choose between 'o' or 's'")
 			cb.board = cb.board[:player1Position] + letter + cb.board[player1Position+1 :] 
- 
+			cb.lower_score += count_oso(cb.board, player1Position)
  
  
 		else:
 # player OSO's turn AI
-			print ("possible moves \n" ,check_moves(cb.board, players_turn))
-			print("Player OSO AI")
+			print("AI's turn")
+			print ("possible moves \n" ,check_moves(cb.board, "OSO"))
 #			for x in cb.all_possible_moves("OSO"):
 #				print("all possible moves " , x.board)
+
 			search_tree = SearchTreeNode(cb, "OSO")
 			search_tree.min_max_value()
 			cb = search_tree.children[-1].current_board
  
  
 
-		players_turn = cb.other(players_turn)
-		print ("state " , cb.state)
+		players_turn = not players_turn
+		print (" " , cb.capital_score , " " , cb.lower_score)
 		cb.display()
  
 	print("The winner is " , cb.state)
