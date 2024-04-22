@@ -5,7 +5,8 @@ import numpy as np
 # There are two problems with the a.csv file. 
 # the team names do not match with the season dataset. So, I copied the names from the season dataset and replace them 
 # The author of the data of teams is wrong. He says that uses the 2019-20 season. However, there are three team names that don't match
-# I don't know which season he is working with, as the team names are not relevant for the project, only the stats, I just replace the wrong team names for the correct ones.
+# I don't know which season he is working with, as the team names are not relevant for the project at all, only the stats, I just replace the wrong team names for the correct ones.
+# Mallorca for girona, Real Vallecano for Granada and Huesca for Osasuna
 # I create the teams.csv file with the correct team names 
 # the a.csv file must be modified with the valid team names manually 
 df = pd.read_csv("new_season.csv")
